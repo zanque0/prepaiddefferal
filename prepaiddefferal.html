@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!-- code by zanque(zanque0@gmail.com) & ChatGPT -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>선납이연 계산기 for 지호은호엄마</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .button {
+            text-align: center;
+        }
+        .button button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .result-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .result-table th, .result-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .result-table th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>선납이연 계산기 for 김은나</h1>
+        <div class="input-group">
+            <label for="balance">보유금액:</label>
+            <input type="number" id="balance">
+        </div>
+        <div class="input-group">
+            <label for="depositRate">예금이율 (%):</label>
+            <input type="number" id="depositRate" step="0.01">
+        </div>
+        <div class="input-group">
+            <label for="savingRate">적금이율 (%):</label>
+            <input type="number" id="savingRate" step="0.01">
+        </div>
+        <div class="input-group">
+            <label for="loanRate">대출이율 (%):</label>
+            <input type="number" id="loanRate" step="0.01">
+        </div>
+        <div class="button">
+            <button onclick="calculateDeferral()">계산하기</button>
+        </div>
+        <table class="result-table" id="resultTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>예금</th>
+                    <th>적금</th>
+                    <th>선납이연100%</th>
+                    <th>선납이연200%</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>세전이자</td>
+                    <td id="beforeTaxDeposit"></td>
+                    <td id="beforeTaxSaving"></td>
+                    <td id="beforeTaxSaving100"></td>
+                    <td id="beforeTaxSaving200"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>세후이자</td>
+                    <td id="afterTaxDeposit"></td>
+                    <td id="afterTaxSaving"></td>
+                    <td id="afterTaxSaving100"></td>
+                    <td id="afterTaxSaving200"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>대출이자</td>
+                    <td id="loanInterestDeposit"></td>
+                    <td id="loanInterestSaving"></td>
+                    <td id="loanInterestSaving100"></td>
+                    <td id="loanInterestSaving200"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>차액</td>
+                    <td id="netProfitDeposit"></td>
+                    <td id="netProfitSaving"></td>
+                    <td id="netProfitSaving100"></td>
+                    <td id="netProfitSaving200"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>예금대비 금리</td>
+                    <td id="netRateDeposit"></td>
+                    <td id="netRateSaving"></td>
+                    <td id="netRateSaving100"></td>
+                    <td id="netRateSaving200"></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function calculateDeferral() {
+            var balance = parseFloat(document.getElementById('balance').value);
+            var depositRate = parseFloat(document.getElementById('depositRate').value);
+            var savingRate = parseFloat(document.getElementById('savingRate').value);
+            var loanRate = parseFloat(document.getElementById('loanRate').value);
+
+            if (isNaN(balance) || isNaN(depositRate) || isNaN(savingRate) || isNaN(loanRate)) {
+                alert('모든 값을 올바르게 입력해 주세요.');
+                return;
+            }
+
+            // 예금 세전이자
+            var beforeTaxDeposit = balance * (depositRate / 100);
+            // 적금 세전이자
+            var beforeTaxSaving = balance * (savingRate / 100) * 1/12 * ((1+2+3+4+5+6+7+8+9+10+11+12)/12);
+            // 선납이연 100% 세전이자
+            var beforeTaxSaving100 = balance * (savingRate / 100) * (6/12 + 1/12* 6/12 + 1/12 * 5/365);
+            // 선납이연 200% 세전이자
+            var beforeTaxSaving200 = balance * 2 * (savingRate / 100) * (6/12 + 1/12* 6/12 + 5/12 * 1/365);
+
+            // 세후이자 (세율 15.4% 가정)
+            var afterTaxDeposit = beforeTaxDeposit * (1 - 0.154);
+            var afterTaxSaving = beforeTaxSaving * (1 - 0.154);
+            var afterTaxSaving100 = beforeTaxSaving100 * (1 - 0.154);
+            var afterTaxSaving200 = beforeTaxSaving200 * (1 - 0.154);
+
+            // 대출이자
+            var loanInterestDeposit = balance * (loanRate / 100) * (0/12);
+            var loanInterestSaving = balance * (loanRate / 100) * (0/12);
+            var loanInterestSaving100 = balance * (loanRate / 100) * (1/12 * 6/12 + 5/12 * 1/365);
+            var loanInterestSaving200 = balance * 2 * (loanRate / 100) * (1/12 * 6/12 + 5/12 * 1/365);
+
+            // 차액
+            var netProfitDeposit = afterTaxDeposit - afterTaxDeposit;
+            var netProfitSaving = afterTaxSaving - afterTaxDeposit;
+            var netProfitSaving100 = afterTaxSaving100 - afterTaxDeposit;
+            var netProfitSaving200 = afterTaxSaving200 - afterTaxDeposit;
+
+            //금리차
+            var netRateDeposit = netProfitDeposit / balance * 100;
+            var netRateSaving = netProfitSaving / balance * 100;
+            var netRateSaving100 = netProfitSaving100 / balance * 100;
+            var netRateSaving200 = netProfitSaving200 / balance * 100;
+
+            // 결과를 테이블에 표시
+            document.getElementById('beforeTaxDeposit').innerText = beforeTaxDeposit.toFixed(2);
+            document.getElementById('beforeTaxSaving').innerText = beforeTaxSaving.toFixed(2);
+            document.getElementById('beforeTaxSaving100').innerText = beforeTaxSaving100.toFixed(2);
+            document.getElementById('beforeTaxSaving200').innerText = beforeTaxSaving200.toFixed(2);
+
+            document.getElementById('afterTaxDeposit').innerText = afterTaxDeposit.toFixed(2);
+            document.getElementById('afterTaxSaving').innerText = afterTaxSaving.toFixed(2);
+            document.getElementById('afterTaxSaving100').innerText = afterTaxSaving100.toFixed(2);
+            document.getElementById('afterTaxSaving200').innerText = afterTaxSaving200.toFixed(2);
+
+            document.getElementById('loanInterestDeposit').innerText = loanInterestDeposit.toFixed(2);
+            document.getElementById('loanInterestSaving').innerText = loanInterestSaving.toFixed(2);
+            document.getElementById('loanInterestSaving100').innerText = loanInterestSaving100.toFixed(2);
+            document.getElementById('loanInterestSaving200').innerText = loanInterestSaving200.toFixed(2);
+
+            document.getElementById('netProfitDeposit').innerText = netProfitDeposit.toFixed(2);
+            document.getElementById('netProfitSaving').innerText = netProfitSaving.toFixed(2);
+            document.getElementById('netProfitSaving100').innerText = netProfitSaving100.toFixed(2);
+            document.getElementById('netProfitSaving200').innerText = netProfitSaving200.toFixed(2);
+
+            document.getElementById('netRateDeposit').innerText = netRateDeposit.toFixed(2);
+            document.getElementById('netRateSaving').innerText = netRateSaving.toFixed(2);
+            document.getElementById('netRateSaving100').innerText = netRateSaving100.toFixed(2);
+            document.getElementById('netRateSaving200').innerText = netRateSaving200.toFixed(2);
+        }
+    </script>
+</body>
+</html>
